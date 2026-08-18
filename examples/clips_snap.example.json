@@ -1,0 +1,26 @@
+{
+  "_comment": "cut_sync.py / snap_cuts.py 的切点数据格式示例（虚构影片，不含任何真实片源信息）。cut_sync 一律以 s/e 为准。",
+  "_comment_en": "Example cut-point data format for cut_sync.py / snap_cuts.py (fictional film, no real source info). cut_sync always uses s/e.",
+  "film": "示例片-2024",
+  "locked": { "resolution": "1920x1080", "fps": "30000/1001" },
+  "clips": [
+    {
+      "s": 120.0,
+      "e": 480.5,
+      "dur": 360.5,
+      "notes": "序幕段：正片第一帧之后起，避免片头厂标/演职员字幕"
+    },
+    {
+      "s": 480.5,
+      "e": 902.0,
+      "dur": 421.5,
+      "notes": "第一章：起因；出点落在句尾能量谷（voiced_end 已处置）"
+    },
+    {
+      "s": 902.0,
+      "e": 1310.0,
+      "dur": 408.0,
+      "notes": "第二章：转折；no_seam 出点已自动句尾延后(auto_extend)"
+    }
+  ]
+}

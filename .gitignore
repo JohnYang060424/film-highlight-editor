@@ -1,0 +1,25 @@
+# ===== 私有配置 / Private config =====
+.env
+*.local
+
+# ===== 语音识别模型二进制（从 models/README.md 下载，不入库） =====
+# ASR model binary (download per models/README.md, not committed)
+models/vosk-zh/
+
+# ===== Python =====
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# ===== 运行期产物（不在仓库内，仅防误提交） =====
+# Runtime artifacts (not part of the repo; guard against accidental commits)
+work/
+output/
+source/
+*.sigcache.json
+
+# ===== 系统/编辑器 =====
+.DS_Store
+Thumbs.db
+*.swp
