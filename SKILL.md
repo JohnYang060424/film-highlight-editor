@@ -10,7 +10,7 @@ agent_created: true
 ```
 影视精华版-film-highlight-editor/     ← 技能包＝只读引擎＋文档，禁止往里写运行产物
 ├── SKILL.md            ← 本协议（唯一权威，旧副本已清除）
-├── scripts/            ← 全部正式脚本（20个，见工具清单）
+├── scripts/            ← 全部正式脚本（21个，见工具清单）
 ├── brand/              ← 品牌资产（render_brand_v2.py 定版 + 预渲染 intro/outro/wm 三档 mp4/png）
 ├── models/             ← vosk 中文小模型 vosk-zh（断网兜底 ASR 用）
 ├── projects/           ← ★工业化生产总目录（每部片一个子文件夹，见下）
@@ -31,7 +31,8 @@ agent_created: true
 - **v13.2**：⑯**品牌定版锁死**（brand/render_brand_v2.py 唯一实现，产物 intro/outro_{720p,1080p,4k}.mp4 已预渲染，直接取用禁再改）；⑰**每部片必须从片头开始完整重看一遍**（§0 硬性步骤，禁凭海报/记忆/旧稿剪辑）；⑱**骨架蒙太奇禁加字幕**——正片段只留原声画面，解说卡与片头卡才挂 SRT；assemble 只喂卡段 SRT；§9 验收加"正片段零字幕"
 - **v13.3**：⑲**骨架必须多场次/多场景组接**（§2.4）——每镜来自不同场次/景别，每幕 ≥4 个不同场次，连续同场景 ≤2 镜；`contact_sheet.py --scenes` 场景切分先验
 - **v13.4**：⑳**解说文本必须独立成文**（§6.0）——先当一篇文章写（250-350字/张卡，钩子→展开→金句/悬念，禁口水话），后贴画面；贴画面只做时长裁剪不做结构让步；QC 念读测试
-- **v14.1**：㉒**配音定版百炼**（qwen3-tts-flash/Bellona 燕铮莺，禁浏览器 TTS；实测 cosyvoice-v3.5 无 Bellona，418）；㉓**生产目录收敛包内 projects/<片名>/{source,work,output}**（对齐 snap_frame 先例），废外部工作区；㉔新增 `tts_bailian.py`+`full_asr.py`（脚本 20 个）
+- **v14.2**：㉕**封面定版大字爆款模板**（render_cover.py，左图右 2 行等大粗黑标题+白铺垫黄爆点+红标签左上+压暗蒙版+vision 五查；废除 v12"封面纯图禁字"）；㉖Pillow≥10 适配（Image.Lanczos/FLIP_LEFT_RIGHT 别名移除，用 Resampling/Transpose）
+- **v14.1**：㉒**配音定版百炼**（qwen3-tts-flash/Bellona 燕铮莺，禁浏览器 TTS；实测 cosyvoice-v3.5 无 Bellona，418）；㉓**生产目录收敛包内 projects/<片名>/{source,work,output}**（对齐 snap_frame 先例），废外部工作区；㉔新增 `tts_bailian.py`+`full_asr.py`（脚本 21 个）
 - **v14**：㉑**单会话全流程批处理**——废除 max/flash 双模型分工与 handoff.json/batch_queue.json 交接协议（双提示词 txt 已删）；每部片一个会话从头跑到尾，跨批续跑靠 batch_list.md 台账＋每片磁盘产物；生产目录收敛包内 projects/；技能包文件夹工业布局（docs/ 归位、旧副本与死脚本清除）
 
 ## 0. 第一步：先读电影（**v13.2 硬性步骤，每部片必做，禁跳过**）
@@ -55,7 +56,7 @@ agent_created: true
 ### 2.3 场景选取"三问"
 ### 2.4 场次多样性（v13.3 硬要求）：每幕 ≥4 个不同场次；连续同场景 ≤2 镜；`contact_sheet.py --scenes` 先验。
 ### 2.5 片尾彩蛋三招（v13.1）：看尾段 3-5min 标彩蛋起止；片头起点保守；骨架/卡素材 `end ≤ 正片结束-60s`。
-### 2.6 品牌与封面禁字（v12）：封面无"4K"水印残留。
+### 2.6 品牌水印禁区（v12）：封面无"4K"等平台水印残留。封面文字版式见 §9.4（v14.2 起封面必带大字标题，旧"封面禁字"条款废除）。
 
 ## 2.7 配音引擎（v14.1 定版：百炼 TTS 主力）
 **本技能包 TTS 引擎 = `scripts/tts_bailian.py`（百炼 qwen3-tts-flash，音色 Bellona=官方"精品百人-燕铮莺"）**。禁用浏览器/系统自带 TTS。用法：`python tts_bailian.py <texts.json> [--outdir tts] [--voice Bellona] [--speed 1.0]`。texts.json=[{"name","text"}...]（兼容 narration_plan.json 的 {"narrations":[{...}]}）；输出 <name>.wav + <name>.dur.json（实测时长回写）+ tts_manifest.json；已建 ttsout 跳过（断点续传）、空输出自动重试、429/超时指数退避。
@@ -121,7 +122,13 @@ agent_created: true
 ### 9.1 人工抽查（抽帧看转场、听音画同步、看黑帧/水印）
 ### 9.2 自动验收（verify_sync.py + check_delivery.py + tail_guard.py，§9.2 清单）：音画偏移>0.3s FAIL；字幕重叠 FAIL；骨架段检出字幕 FAIL；片尾彩蛋混入 FAIL；封面黑帧 FAIL；时长超 band FAIL。
 ### 9.3 防剧透插卡复检
-### 9.4 封面（cover_loop.py，禁黑帧禁字，纯图）
+### 9.4 封面（v14.2 定版：大字爆款模板，scripts/render_cover.py）
+用户 2026-09-07 钦定（推翻 v12"封面纯图禁字"）：照 B 站爆款参考图版式——**醒目+吸睛**。
+- **版式基因**：左图右大字——正片人物有戏剧张力的一帧居左（侧脸/呼喊/惊讶最佳），右半幅 **横排 2 行、等大粗黑体、左对齐**；**白字铺垫 + 黄字爆点**（`白:强调` 冒号分段，两行黄字连读=完整悬念钩子句）；粗黑描边+强投影（暗背景剥离）；左上红底白字片名/导演标签（信任背书，永远左上不随标题位）；文字侧背景压暗横向渐变蒙版。
+- **钩子句规范**：每行 5-7 字（含强调段），句末 `！/？`；禁剧透结局词（按 §7.3）；字号自适应下限 90，目标 ≥170（1/5 屏高才算爆）。
+- **背景三步**：①work/cover/ 候选帧目核定分（面部张力/压字区/字幕占用三维）；②"面部张力与无字幕常互斥"——带字幕帧必预裁（crop 底部 ~15% + 水平偏移把人物甩到左侧 1/4，红告示等干扰色一并裁出）；③渲染后 **vision 五查**：字幕裁净/大字填满/图文不遮挡/标签左上/缩略图 1/4 可读，FAIL 调参重渲 ≤3 轮。
+- **禁黑帧**（保留）：候选帧亮度均值 ≥120 或目核非黑；禁直接取转场/片尾帧。
+- 成品 PNG+JPG(92) 同名入 output/；`cover_loop.py` 仅做封面→3s 片头视频转换。
 ### 9.5 字幕防重叠
 ### 9.6 剪辑范围复检
 ### 9.7 骨架场次多样性复检（v13.3）
@@ -163,6 +170,7 @@ agent_created: true
 | 7 | `tts_bailian.py` | **v14.1 主力 TTS**：百炼 qwen3-tts-flash/Bellona（逐帧解码+重试+manifest 记账） |
 | 0 | `full_asr.py` | 全片离线 ASR（vosk-zh→台词本.txt/json，秒级时间戳；中文路径自动 junction） |
 | 8 | `render_transition.py` | PIL 透明长条 + overlay 滚动转场视频 |
+| 9 | `render_cover.py` | **§9.4 爆款封面模板**：背景帧+两行双色大字+红标签→PNG/JPG（2026-09-07 定版） |
 | 9 | `cover_loop.py` | 封面图 → 3s 静音片头 loop（v14 §9.4 防黑帧选帧内建） |
 | 10 | `assemble.py` | 归一化拼接（v8 帧网格量化金标准；v12 品牌三缝合入；v13.2 分辨率锁定） |
 | 11 | `verify_sync.py` | 音画同步三级法（L1 时长/L2 PTS/L3 内容级） |
@@ -201,7 +209,7 @@ agent_created: true
 §2.7 TTS(tts_bailian.py→句级wav+实测时长回写时序) → §3 选镜+cutprobe_sheet+snap_cuts
 §6 组装(cut_sync→assemble 品牌三缝→render_prologue片头→卡段SRT字幕，骨架零字幕)
 §2.5/§8 彩蛋三查+防剧透插卡 → §9.1/9.2 自动验收(verify_sync+check_delivery+tail_guard，FAIL修复≤3轮)
-§9.4 封面(禁黑帧禁字) → §10 联网核实+发布包三件套(标题≤40/简介150-220字/禁提模型技能名)
+§9.4 封面(render_cover 大字爆款+vision五查) → §10 联网核实+发布包三件套(标题≤40/简介150-220字/禁提模型技能名)
 → output/ 三件套 + 剪辑报告.md(§13 决策留痕) → 台账标 done → 交付清单(MEDIA: 链接)。
 
 【边界】交付=B站三件套清单为止；OSS/clipboard 未配置则本地交付；一切人工平台操作不代办不承诺。

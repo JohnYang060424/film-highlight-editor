@@ -14,8 +14,8 @@
 
 ### 它能做什么
 - 输入一整部影片（或一批影片），输出约 10–30 分钟、信息密度高、带故事脉络片头与解说转场的精华版（实测 141min 长片 → 12.6min）；
-- 自动交付 **B 站三件套**：成片、封面、标题简介标签文案，外加剪辑报告与生产台账；
-- 配套 **20 个 Python 脚本**，覆盖摸底（全片 ASR + 接触表）→ 切点吸附 → 探针目核 → 切香肠式分段截取 → 百炼 TTS 解说 → 滚动解说卡 → 拼接 → 音画同步质检 → 水印 → 交付自检全流程；
+- 自动交付 **B 站三件套**：成片、**爆款大字封面**（左图右双行大标题、白铺垫黄爆点，render_cover.py 模板+vision 五查）、标题简介标签文案，外加剪辑报告与生产台账；
+- 配套 **21 个 Python 脚本**，覆盖摸底（全片 ASR + 接触表）→ 切点吸附 → 探针目核 → 切香肠式分段截取 → 百炼 TTS 解说 → 滚动解说卡 → 拼接 → 音画同步质检 → 水印 → 交付自检全流程；
 - **v14.1 单会话全流程**：一个会话从读片到交付跑完一部片（已废除早期双模型 handoff/队列协议）；一切决策落盘到 `projects/<片名>/`，失败隔离、断点可续、批量可跑。
 
 ### 核心特性
@@ -35,7 +35,7 @@ film-highlight-editor/
 ├── CHANGELOG.md          # 版本记录
 ├── .gitignore
 ├── .env.example          # 交付配置模板（仅占位，不含任何密钥）
-├── scripts/              # 20 个配套脚本（详见 SKILL.md「配套脚本」表）
+├── scripts/              # 21 个配套脚本（详见 SKILL.md「配套脚本」表）
 ├── projects/             # 生产数据目录（README=章法规范；数据本体不入库）
 ├── brand/                # 品牌资产：logo / 水印 / 片头片尾视频 / 音效 + 构建脚本
 ├── models/               # 语音识别模型目录（见 models/README.md，二进制不入库）
@@ -98,7 +98,7 @@ cp .env.example .env
   and narration transitions (field test: 141-min feature → 12.6-min cut, zero A/V drift).
 - Auto-delivers the **Bilibili three-piece set**: final video, cover, title/description/tags copy, plus an
   editing report and a production ledger.
-- Ships **20 Python scripts**: scouting (full-film ASR + contact sheets) → cut snapping → probe review →
+- Ships **21 Python scripts**: scouting (full-film ASR + contact sheets) → cut snapping → probe review →
   sausage-style segment cutting → Bailian TTS narration → scrolling caption cards → assembly → A/V sync QA →
   watermark → delivery self-check.
 - **v14.1 single-session pipeline**: one agent session runs a film end-to-end (the earlier two-model

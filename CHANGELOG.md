@@ -1,5 +1,12 @@
 # Changelog
 
+## v2.1 (2026-09-07)
+- 封面引擎定版：新增 `scripts/render_cover.py`（爆款大字模板：正片张力帧居左 + 右半两行等大粗黑标题、
+  白字铺垫/黄字爆点、粗描边+强投影、左上红底片名标签、文字侧压暗蒙版），vision 五查验收（裁净/填满/
+  不遮挡/标签位/缩略图可读）；废除 v12 时代"封面纯图禁字"规则（作者按爆款参考图钦定推翻）。
+- Pillow>=10 兼容（`Image.Resampling.LANCZOS` / `Image.Transpose.FLIP_LEFT_RIGHT`）。
+- SKILL.md → v14.2；脚本计数 21。
+
 ## v2.0 (2026-09-07)
 - **v14.1 单会话全流程**：废除双模型（max/flash）handoff 与 batch_queue 文件传递协议——一个会话从读片跑到交付；失败隔离/断点续跑改由 `projects/batch_list.md` 台账 + 磁盘产物承担。
 - **工业化目录收敛进仓库**：生产数据统一 `projects/<片名>/{source,work,output}` 三级（规范见 `projects/README.md`，数据本体 .gitignore 不入库）。
