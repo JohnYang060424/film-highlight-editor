@@ -23,3 +23,11 @@ source/
 .DS_Store
 Thumbs.db
 *.swp
+
+# ===== 生产数据（按片名分目录，不入库；见 projects/README.md） =====
+projects/batch_list.md
+projects/*/
+!projects/README.md
+.sigcache.json
+*.dur.json
+scratch/

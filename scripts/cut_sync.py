@@ -39,6 +39,7 @@ def main():
     ap.add_argument("--outdir", default="segs")
     ap.add_argument("--crf", type=int, default=18)
     ap.add_argument("--preset", default="veryfast")
+    ap.add_argument("--vf", default="", help="附加视频滤镜（如 letterbox: scale=1920:-2,pad=1920:1080:0:136:black,fps=25）")
     a = ap.parse_args()
     os.makedirs(a.outdir, exist_ok=True)
 
@@ -58,6 +59,7 @@ def main():
              "-ss", f"{s:.3f}", "-t", f"{dur:.3f}",
              "-i", a.video,
              "-map", "0:v:0", "-map", "0:a:0",
+             *(["-vf", a.vf] if a.vf else []),
              "-c:v", "libx264", "-crf", str(a.crf), "-preset", a.preset,
              "-c:a", "aac", "-ar", "48000", "-ac", "2", "-b:a", "192k",
              out_f])

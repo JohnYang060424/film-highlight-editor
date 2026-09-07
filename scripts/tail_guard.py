@@ -132,17 +132,38 @@ def main():
     ap.add_argument("--model", default="")
     ap.add_argument("--ocr-only", action="store_true")
     ap.add_argument("--asr-only", action="store_true")
+    ap.add_argument("--brand-ok", default="", metavar="WORDS",
+                    help="逗号分隔的品牌自带文字（水印/片尾logo/字幕条名等），命中纯品牌帧不算残留；如 '翔远视界'")
     a = ap.parse_args()
 
     segs = ([{"name": "seg", "s": a.seg[0], "e": a.seg[1]}] if a.seg
             else json.load(open(a.clips, encoding="utf-8")))
 
     ocr = None if a.asr_only else OcrLayer()
+    brand_ok = [w.strip() for w in a.brand_ok.split(",") if w.strip()]
+
+    def _pure_brand(text):
+        """整行 OCR 的中文核去掉品牌词后为空 → 自家水印/落版帧，不算残留。"""
+        if not brand_ok:
+            return False
+        core = re.sub(r"[^\u4e00-\u9fff]", "", text)
+        if not core:
+            return False  # 纯拉丁/数字（英文字幕等）不豁免
+        for w in brand_ok:
+            core = core.replace(w, "")
+        return core == ""
     asr = None
     if not a.ocr_only:
-        mdir = a.model or os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), "..", "models", "vosk-zh")
-        asr = AsrLayer(mdir) if os.path.isdir(mdir) else \
+        mdir = a.model or os.path.normpath(os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), "..", "models", "vosk-zh"))
+        if os.path.isdir(mdir):
+            try:
+                from full_asr import _ascii_model_path   # vosk 不吃非 ASCII 路径
+                mdir = _ascii_model_path(mdir)
+            except Exception:
+                pass
+            asr = AsrLayer(mdir)
+        else:
             print(f"[warn] vosk 模型缺失: {mdir} → 跳过 ASR 层")
 
     fails = passes = 0
@@ -156,6 +177,9 @@ def main():
         lo = round(max(s + 1.0, e - 16.0) * 2) / 2
         hi = e + a.extend
         ocr0 = ocr.scan(a.video, lo, hi - lo, fps=2.0) if ocr else []
+        # brand-ok: 纯品牌帧（自家水印/落版 logo 字样）不算残留文字
+        if brand_ok:
+            ocr0 = [(t, tx) for t, tx in ocr0 if not _pure_brand(tx)]
         # 相位确认：对每个相位0命中，定向抽 t+0.25 单帧复核（省全窗二次扫描）
         conf_ocr = []
         if ocr:

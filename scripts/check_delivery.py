@@ -45,7 +45,7 @@ def main():
     n_segs = sum(1 for ln in lines
                  if re.search(r"m\d+\.mp4", os.path.basename(ln.replace("\\", "/"))))
     n_trans = sum(1 for ln in lines
-                  if re.search(r"trans_\d+\.mp4", os.path.basename(ln.replace("\\", "/"))))
+                  if re.search(r"(trans_\d+|card_\d+)\.mp4", os.path.basename(ln.replace("\\", "/"))))
 
     errors = []
 
@@ -66,6 +66,10 @@ def main():
         else:
             dur_min = dur / 60
             for m in re.finditer(r"(\d+(?:\.\d+)?)\s*(?:min|分钟)", txt):
+                # 上下文含"原片/原作/原剧/原著"= 描述素材片长，不是成片时长声明，跳过
+                ctx = txt[max(0, m.start() - 12):m.end() + 12]
+                if re.search(r"原片|原作|原剧|原著|小说|版本", ctx):
+                    continue
                 claim = float(m.group(1))
                 if abs(claim - dur_min) > 0.5:
                     errors.append(f"文案 '{m.group(0)}' ≠ 实测 {dur_min:.1f}min")
